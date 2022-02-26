@@ -25,7 +25,7 @@ void swaparray(int m[], int size,
     }
 }
 
-void move(int type, int &coord_nums_k, int &coord_hor_k, int &coord_ver_k, int arr[][w],
+void move(int type,  int &coord_hor_k, int &coord_ver_k, int arr[][w],
               std::default_random_engine &rnd_eng, std::uniform_real_distribution<double> &dstr){
 
     if (arr[coord_hor_k][coord_ver_k] == type){
@@ -87,6 +87,41 @@ void show_crystal(int arr[][w]) {
         }
     }
     cout << '\n';
+}
+
+// ПРОВЕРЯЮ НА СОСЕДСТВА ПУСТОТ, СОСЕДСТВА С ГРАНИЦЕЙ
+void subfun(int j_start, int j_stop, int i, int type, int coord_hor[], int coord_ver[], int arr[][w]) {
+    int j;
+    for (j = j_start; j < j_stop; j++) {
+        if (arr[coord_hor[i]][coord_ver[i]] == type) {
+            if (coord_ver[i] == coord_ver[j] &&
+                arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
+                if (coord_hor[i] - 1 == coord_hor[j] || coord_hor[i] + 1 == coord_hor[j]) {
+                    arr[coord_hor[i]][coord_ver[i]] = 10 - type;
+                    arr[coord_hor[j]][coord_ver[j]] = 10 - type;
+                }
+            }
+            if (coord_hor[i] == coord_hor[j] &&
+                arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
+                if (coord_ver[i] - 1 == coord_ver[j] || coord_ver[i] + 1 == coord_ver[j]) {
+                    arr[coord_hor[i]][coord_ver[i]] = 10 - type;
+                    arr[coord_hor[j]][coord_ver[j]] = 10 - type;
+                }
+            }
+        }
+    }
+}
+void check(int type, int amount_dis, int coord_hor[], int coord_ver[], int arr[][w]) {
+    int i;
+    for (i = 0; i < amount_dis; i++) {
+        if (coord_hor[i] == 0 || coord_hor[i] == 9 || coord_ver[i] == 0 || coord_ver[i] == 9
+            && arr[coord_hor[i]][coord_ver[i]] == type ){
+            arr[coord_hor[i]][coord_ver[i]] = 10-type; // 1-> 9, а 2-> 8. FIXME: Чтобы 1 не взаим. с 8, а 2 - с 9.
+        }
+        subfun(0,i, i, type, coord_hor, coord_ver, arr);
+        //Избегаю проверять дислокацию с самой собой, то есть когда i == j, т.к. это бесполезно
+        subfun(i+1,amount_dis, i, type, coord_hor, coord_ver, arr);
+    }
 }
 
 // Показываю, что есть во втором файле данная функция, отвечающая за случай 1-мерного кристалла
@@ -158,49 +193,12 @@ int main() {
                 while (amount_dis != 0) {
                     show_crystal(arr);
                     counter++;
-                    // ПРОВЕРЯЮ НА СОСЕДСТВА ПУСТОТ, СОСЕДСТВА С ГРАНИЦЕЙ
-                    for (i = 0; i < amount_dis; i++) {
-                        if (coord_hor[i] == 0 || coord_hor[i] == 9 || coord_ver[i] == 0 || coord_ver[i] == 9) {
-                            arr[coord_hor[i]][coord_ver[i]] = 9; // FIXME 1-> 9, а 2-> должны в 8. и Чтобы 1 не взаим. с 8, а 2 - с 9.
-                        }
-                        for (j = 0; j < i; j++) {
-
-                            if (coord_ver[i] == coord_ver[j] && arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
-                                if (coord_hor[i] - 1 == coord_hor[j] || coord_hor[i] + 1 == coord_hor[j]) {
-                                    arr[coord_hor[i]][coord_ver[i]] = 9;
-                                    arr[coord_hor[j]][coord_ver[j]] = 9;
-                                }
-                            }
-                            if (coord_hor[i] == coord_hor[j] && arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
-                                if (coord_ver[i] - 1 == coord_ver[j] || coord_ver[i] + 1 == coord_ver[j]) {
-                                    arr[coord_hor[i]][coord_ver[i]] = 9;
-                                    arr[coord_hor[j]][coord_ver[j]] = 9;
-                                }
-                            }
-                        }
-                        //Избегаю проверять дислокацию с самой собой, то есть когда i == j, т.к. это бесполезно
-                        for (j = i+1; j < amount_dis; j++) {
-
-                            if (coord_ver[i] == coord_ver[j] &&
-                                arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
-                                if (coord_hor[i] - 1 == coord_hor[j] || coord_hor[i] + 1 == coord_hor[j]) {
-                                    arr[coord_hor[i]][coord_ver[i]] = 9;
-                                    arr[coord_hor[j]][coord_ver[j]] = 9;
-                                }
-                            }
-                            if (coord_hor[i] == coord_hor[j] &&
-                                arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
-                                if (coord_ver[i] - 1 == coord_ver[j] || coord_ver[i] + 1 == coord_ver[j]) {
-                                    arr[coord_hor[i]][coord_ver[i]] = 9;
-                                    arr[coord_hor[j]][coord_ver[j]] = 9;
-                                }
-                            }
-                        }
-                    }
+                    check(1, amount_dis, coord_hor, coord_ver, arr);
+                    check(2, amount_dis, coord_hor, coord_ver, arr);
 
                     // удаляю координаты остановившегося эл-та
                     for (k = 0; k < amount_dis; k++) {
-                        if (arr[coord_hor[k]][coord_ver[k]] == 9) {
+                        if (arr[coord_hor[k]][coord_ver[k]] == 8 ||arr[coord_hor[k]][coord_ver[k]] == 9) {
                             for (j = k; j < amount_dis; j++) {
                                 coord_hor[j] = coord_hor[j + 1];
                                 coord_ver[j] = coord_ver[j + 1];
@@ -227,8 +225,8 @@ int main() {
                     // ДВИГАЮ ДИСЛОКАЦИИ
                     for (k = 0; k < amount_dis; k++) {
 
-                        move(1, coord_nums[k], coord_hor[coord_nums[k]], coord_ver[coord_nums[k]], arr, rnd_eng, dstr);
-                        move(2, coord_nums[k], coord_hor[coord_nums[k]], coord_ver[coord_nums[k]], arr, rnd_eng, dstr);
+                        move(1,coord_hor[coord_nums[k]], coord_ver[coord_nums[k]], arr, rnd_eng, dstr);
+                        move(2, coord_hor[coord_nums[k]], coord_ver[coord_nums[k]], arr, rnd_eng, dstr);
 
                     }
 
