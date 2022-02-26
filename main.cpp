@@ -62,9 +62,36 @@ void move(int type, int &coord_nums_k, int &coord_hor_k, int &coord_ver_k, int a
     }
 }
 
+using namespace std;
+
+// ИЗОБРАЖАЮ МАССИВЫ КООРДИНАТ
+void show_coord(int amount_dis,int coord_hor[], int coord_ver[]){
+    cout << '\n';
+    for (int k = 0; k < amount_dis; k++) {
+        cout << coord_hor[k] << ' ';
+    }
+    cout << '\n';
+    cout << '\n';
+    for (int k = 0; k < amount_dis; k++) {
+        cout << coord_ver[k] << ' ';
+    }
+    cout << '\n';
+}
+
+// ИЗОБРАЖАЮ КРИСТАЛЛ СО СЛИПШИМИСЯ ПУСТОТАМИ
+void show_crystal(int arr[][w]) {
+    for (int i = 0; i <= 9; i++) {
+        cout << '\n';
+        for (int j = 0; j <= 9; j++) {
+            cout << arr[i][j] << ' ';
+        }
+    }
+    cout << '\n';
+}
+
+// Показываю, что есть во втором файле данная функция, отвечающая за случай 1-мерного кристалла
 int linear(int size, int (arr_av)[]);
 
-using namespace std;
 
 int main() {
     auto current_time =
@@ -95,7 +122,7 @@ int main() {
                 for (i = 0; i < h; i++) {
                     for (j = 0; j < w; j++) {
                         if (maybe(prob_dis * 0.01, rnd_eng, dstr)){
-                            arr[i][j] = maybe(0.5, rnd_eng, dstr)+1; // если 0, то +1 =1= красный; если 1, то +1=2=синий
+                            arr[i][j] = maybe(0.5, rnd_eng, dstr)+1; // если 0, то +1 =1=красный; если 1, то +1=2=синий; их вер-ть равна
                             amount_dis++;
                         }
                         else arr[i][j] = 0;
@@ -109,50 +136,63 @@ int main() {
                 int coord_hor[amount_dis]; // массив с гориз коорд единиц
                 int coord_ver[amount_dis]; // с вертикальными коорд.
 
+
                 // заполняю массивы координат единиц
                 int k = 0; // индекс эл-ов массивов координат
-                for (j = 0; j <= w; j++) {
-                    for (i = 0; i <= h; i++) {
+                for (j = 0; j < w; j++) {
+                    for (i = 0; i < h; i++) {
                         if (arr[i][j] == 1 || arr[i][j] == 2) {
                             coord_hor[k] = i;
                             coord_ver[k] = j;
-                            k += 1;
+                            k++;
                         }
-
                     }
                 }
                 cout << '\n';
 
-                // ИЗОБРАЖАЮ МАССИВЫ КООРДИНАТ
-                cout << '\n';
-                for (i = 0; i <amount_dis; i++){
-                    cout << coord_hor[i] << ' ';
-                }
-                cout << '\n';
-                cout << '\n';
-                for (i = 0; i <amount_dis; i++){
-                    cout << coord_ver[i] << ' ';
-                }
-                cout << '\n';
 
-                int counter = 0;
+                show_coord(amount_dis, coord_hor, coord_ver);
+
+                int counter = 0; // счётчик кол-ва шагов
 
                 while (amount_dis != 0) {
+                    show_crystal(arr);
                     counter++;
                     // ПРОВЕРЯЮ НА СОСЕДСТВА ПУСТОТ, СОСЕДСТВА С ГРАНИЦЕЙ
                     for (i = 0; i < amount_dis; i++) {
                         if (coord_hor[i] == 0 || coord_hor[i] == 9 || coord_ver[i] == 0 || coord_ver[i] == 9) {
-                            arr[coord_hor[i]][coord_ver[i]] = 9;
+                            arr[coord_hor[i]][coord_ver[i]] = 9; // FIXME 1-> 9, а 2-> должны в 8. и Чтобы 1 не взаим. с 8, а 2 - с 9.
                         }
-                        for (j = 0; j < amount_dis; j++) {
+                        for (j = 0; j < i; j++) {
+
                             if (coord_ver[i] == coord_ver[j] && arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
                                 if (coord_hor[i] - 1 == coord_hor[j] || coord_hor[i] + 1 == coord_hor[j]) {
                                     arr[coord_hor[i]][coord_ver[i]] = 9;
+                                    arr[coord_hor[j]][coord_ver[j]] = 9;
                                 }
                             }
                             if (coord_hor[i] == coord_hor[j] && arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
                                 if (coord_ver[i] - 1 == coord_ver[j] || coord_ver[i] + 1 == coord_ver[j]) {
                                     arr[coord_hor[i]][coord_ver[i]] = 9;
+                                    arr[coord_hor[j]][coord_ver[j]] = 9;
+                                }
+                            }
+                        }
+                        //Избегаю проверять дислокацию с самой собой, то есть когда i == j, т.к. это бесполезно
+                        for (j = i+1; j < amount_dis; j++) {
+
+                            if (coord_ver[i] == coord_ver[j] &&
+                                arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
+                                if (coord_hor[i] - 1 == coord_hor[j] || coord_hor[i] + 1 == coord_hor[j]) {
+                                    arr[coord_hor[i]][coord_ver[i]] = 9;
+                                    arr[coord_hor[j]][coord_ver[j]] = 9;
+                                }
+                            }
+                            if (coord_hor[i] == coord_hor[j] &&
+                                arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
+                                if (coord_ver[i] - 1 == coord_ver[j] || coord_ver[i] + 1 == coord_ver[j]) {
+                                    arr[coord_hor[i]][coord_ver[i]] = 9;
+                                    arr[coord_hor[j]][coord_ver[j]] = 9;
                                 }
                             }
                         }
@@ -169,27 +209,9 @@ int main() {
                             k--;
                         }
                     }
-
-                    // ИЗОБРАЖАЮ КРИСТАЛЛ СО СЛИПШИМИСЯ ПУСТОТАМИ
-                    for (i = 0; i <= 9; i++) {
-                        cout << '\n';
-                        for (j = 0; j <= 9; j++) {
-                            cout << arr[i][j] << ' ';
-                        }
-                    }
-                    cout << '\n';
-
-                    // ИЗОБРАЖАЮ МАССИВЫ КООРДИНАТ
-                    /*cout << '\n';
-                    for (i = 0; i < amount_dis; i++) {
-                        cout << coord_hor[i] << ' ';
-                    }
-                    cout << '\n';
-                    cout << '\n';
-                    for (i = 0; i < amount_dis; i++) {
-                        cout << coord_ver[i] << ' ';
-                    }
-                    cout << '\n';*/
+                    show_coord(amount_dis, coord_hor, coord_ver);
+                    show_crystal(arr);
+                    show_coord(amount_dis, coord_hor, coord_ver);
 
                     // ПЕРЕМЕШИВАЮ КООРДИНАТЫ
                     int coord_nums[amount_dis];
@@ -210,14 +232,7 @@ int main() {
 
                     }
 
-                    // ИЗОБРАЖАЮ КРИСТАЛЛ СО СЛИПШИМИСЯ ПУСТОТАМИ
-                    /*for (i = 0; i <= 9; i++) {
-                        cout << '\n';
-                        for (j = 0; j <= 9; j++) {
-                            cout << arr[i][j] << ' ';
-                        }
-                    }
-                    cout << '\n';*/
+
                 }
 
                 /*cout << '\n' << "counter= " << counter
