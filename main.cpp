@@ -25,40 +25,92 @@ void swaparray(int m[], int size,
     }
 }
 
-void move(int type,  int &coord_hor_k, int &coord_ver_k, int arr[][w],
+void move(int type,  int &coord_hor_k, int &coord_ver_k, int arr[][w], int memory[][w],
               std::default_random_engine &rnd_eng, std::uniform_real_distribution<double> &dstr){
 
-    if (arr[coord_hor_k][coord_ver_k] == type){
-        if (maybe(0.5, rnd_eng, dstr)) { // По гориз
-            if (maybe(0.5, rnd_eng, dstr)) { // вправо
-                if (arr[coord_hor_k + 1][coord_ver_k] != type ) {
-                    arr[coord_hor_k][coord_ver_k] = 0;
-                    arr[coord_hor_k + 1][coord_ver_k] = type;
-                    coord_hor_k++;
+    if (arr[coord_hor_k][coord_ver_k] == type || memory[coord_hor_k][coord_ver_k] == type){
+        if (maybe(0.5, rnd_eng, dstr)) { // По вертик
+            if (maybe(0.5, rnd_eng, dstr)) { // вверх
+                if (arr[coord_hor_k + 1][coord_ver_k] != type){
+                     if (arr[coord_hor_k + 1][coord_ver_k] == 1 || arr[coord_hor_k + 1][coord_ver_k] == 2 ||
+                                arr[coord_hor_k + 1][coord_ver_k] == 8 || arr[coord_hor_k + 1][coord_ver_k] == 9) {
+                         memory[coord_hor_k+1][coord_ver_k] = arr[coord_hor_k + 1][coord_ver_k];
+                     }
+                     if (arr[coord_hor_k][coord_ver_k] == type){
+                         arr[coord_hor_k][coord_ver_k] = memory[coord_hor_k][coord_ver_k];
+                     }
 
+                     memory[coord_hor_k][coord_ver_k] = 0;
+                     arr[coord_hor_k + 1][coord_ver_k] = type;
+                     coord_hor_k++;
                 }
-            } else { // влево
-                if (arr[coord_hor_k - 1][coord_ver_k] != type) {
-                    arr[coord_hor_k][coord_ver_k] = 0;
+                else{
+                    arr[coord_hor_k + 1][coord_ver_k] = 10 - type;
+                    arr[coord_hor_k][coord_ver_k] = 10 - type;
+                }
+            }
+            else { // вниз
+                if (arr[coord_hor_k - 1][coord_ver_k] != type){
+                    if (arr[coord_hor_k - 1][coord_ver_k] == 1 || arr[coord_hor_k - 1][coord_ver_k] == 2 ||
+                        arr[coord_hor_k - 1][coord_ver_k] == 8 || arr[coord_hor_k - 1][coord_ver_k] == 9) {
+                        memory[coord_hor_k - 1][coord_ver_k] = arr[coord_hor_k - 1][coord_ver_k];
+                    }
+                    if (arr[coord_hor_k][coord_ver_k] == type) {
+                        arr[coord_hor_k][coord_ver_k] = memory[coord_hor_k][coord_ver_k];
+                    }
+                    memory[coord_hor_k][coord_ver_k] = 0;
                     arr[coord_hor_k - 1][coord_ver_k] = type;
                     coord_hor_k--;
                 }
+                else{
+                    arr[coord_hor_k - 1][coord_ver_k] = 10 - type;
+                    arr[coord_hor_k][coord_ver_k] = 10 - type;
+                }
             }
-        } else { // По вертик
-            if (maybe(0.5, rnd_eng, dstr)) { // вверх
-                if (arr[coord_hor_k][coord_ver_k + 1] != type) {
-                    arr[coord_hor_k][coord_ver_k] = 0;
+        } else { // По гориз
+            if (maybe(0.5, rnd_eng, dstr)) { // вправо
+                if (arr[coord_hor_k][coord_ver_k+1] != type){
+                    if (arr[coord_hor_k][coord_ver_k + 1] == 1 || arr[coord_hor_k][coord_ver_k + 1] == 2 ||
+                        arr[coord_hor_k][coord_ver_k+1] == 8 || arr[coord_hor_k][coord_ver_k + 1] == 9) {
+                        memory[coord_hor_k][coord_ver_k + 1] = arr[coord_hor_k][coord_ver_k + 1];
+                    }
+                    if (arr[coord_hor_k][coord_ver_k] == type) {
+                        arr[coord_hor_k][coord_ver_k] = memory[coord_hor_k][coord_ver_k];
+                    }
+                    memory[coord_hor_k][coord_ver_k] = 0;
                     arr[coord_hor_k][coord_ver_k + 1] = type;
                     coord_ver_k++;
                 }
-            } else { // вниз
-                if (arr[coord_hor_k][coord_ver_k - 1] != type) {
-                    arr[coord_hor_k][coord_ver_k] = 0;
+                else{
+                    arr[coord_hor_k][coord_ver_k + 1] = 10 - type;
+                    arr[coord_hor_k][coord_ver_k] = 10 - type;
+                }
+            }
+
+            else { // влево
+                if (arr[coord_hor_k][coord_ver_k - 1] != type){
+                    if (arr[coord_hor_k][coord_ver_k - 1] == 1 || arr[coord_hor_k][coord_ver_k - 1] == 2 ||
+                        arr[coord_hor_k][coord_ver_k - 1] == 8 || arr[coord_hor_k][coord_ver_k - 1] == 9) {
+                        memory[coord_hor_k][coord_ver_k - 1] = arr[coord_hor_k][coord_ver_k - 1];
+                    }
+                    if (arr[coord_hor_k][coord_ver_k] == type) {
+                        arr[coord_hor_k][coord_ver_k] = memory[coord_hor_k][coord_ver_k];
+                    }
+                    memory[coord_hor_k][coord_ver_k] = 0;
                     arr[coord_hor_k][coord_ver_k - 1] = type;
                     coord_ver_k--;
                 }
+                else{
+                    arr[coord_hor_k][coord_ver_k - 1] = 10 - type;
+                    arr[coord_hor_k][coord_ver_k] = 10 - type;
+                }
             }
         }
+    }
+    else if((memory[coord_hor_k][coord_ver_k] == 8 || memory[coord_hor_k][coord_ver_k] == 9)&& arr[coord_hor_k][coord_ver_k] == 0){
+        arr[coord_hor_k][coord_ver_k] = memory[coord_hor_k][coord_ver_k];
+        memory[coord_hor_k][coord_ver_k] = 0;
+        std::cout << '!' << std::endl;
     }
 }
 
@@ -90,71 +142,33 @@ void show_crystal(int arr[][w]) {
 }
 
 // ПРОВЕРЯЮ НА СОСЕДСТВА ПУСТОТ, СОСЕДСТВА С ГРАНИЦЕЙ
-void delete_9_8(int &i, int &amount_dis, int coord_hor[], int coord_ver[]){
-    int del_idx;
-    for (del_idx = i; del_idx<amount_dis; del_idx++) {
-        coord_hor[del_idx] = coord_hor[del_idx + 1];
-        coord_ver[del_idx] = coord_ver[del_idx + 1];
+
+void in_crystal(int i, int type, int coord_hor[], int coord_ver[], int arr[][w], int memory[][w]) {
+
+    if (arr[coord_hor[i]+1][coord_ver[i]] == 10 - type || arr[coord_hor[i]+1][coord_ver[i]] == type ||
+        arr[coord_hor[i]-1][coord_ver[i]] == 10 - type || arr[coord_hor[i]-1][coord_ver[i]] == type ||
+        arr[coord_hor[i]][coord_ver[i]+1] == 10 - type || arr[coord_hor[i]][coord_ver[i]+1] == type ||
+        arr[coord_hor[i]][coord_ver[i]-1] == 10 - type || arr[coord_hor[i]][coord_ver[i]-1] == type) {
+            arr[coord_hor[i]][coord_ver[i]] = 10 - type;
     }
-    amount_dis -= 1;
-    i--;
-}
-void in_crystal(int j_start, int j_stop, int i, int type, int coord_hor[], int coord_ver[], int arr[][w]) {
-    int j;
-    for (j = j_start; j < j_stop; j++) {
-        if (coord_ver[i] == coord_ver[j]){
-            if (type == arr[coord_hor[j]][coord_ver[j]]) {
-                if (coord_hor[i] - 1 == coord_hor[j] || coord_hor[i] + 1 == coord_hor[j]) {
-                    arr[coord_hor[i]][coord_ver[i]] = 10 - type;
-                    arr[coord_hor[j]][coord_ver[j]] = 10 - type;
-                    cout << "hor " <<coord_hor[i]<< "ver " << coord_ver[i];
-                    //delete_9_8(i, amount_dis, coord_hor, coord_ver);
-                }
-            }
-            else if (10 - type == arr[coord_hor[j]][coord_ver[j]]) {
-                if (coord_hor[i] - 1 == coord_hor[j] || coord_hor[i] + 1 == coord_hor[j]) {
-                    arr[coord_hor[i]][coord_ver[i]] = 10 - type;
-                    cout << "hor " <<coord_hor[i]<< "ver " << coord_ver[i];
-                }
-            }
-
-        }
-
-        if (coord_hor[i] == coord_hor[j]) {
-            if (type == arr[coord_hor[j]][coord_ver[j]]) {
-                if (coord_ver[i] - 1 == coord_ver[j] || coord_ver[i] + 1 == coord_ver[j]) {
-                    arr[coord_hor[i]][coord_ver[i]] = 10 - type;
-                    arr[coord_hor[j]][coord_ver[j]] = 10 - type;
-                    //delete_9_8(i, amount_dis, coord_hor, coord_ver);
-                    cout << "hor " <<coord_hor[i]<< "ver " << coord_ver[i];
-                }
-            }
-            else if (10 - type == arr[coord_hor[j]][coord_ver[j]]) {
-                if (coord_ver[i] - 1 == coord_ver[j] || coord_ver[i] + 1 == coord_ver[j]) {
-                    arr[coord_hor[i]][coord_ver[i]] = 10 - type;
-                    cout << "hor " <<coord_hor[i]<< "ver " << coord_ver[i];
-                }
-            }
-        }
+    if (memory[coord_hor[i]+1][coord_ver[i]] == 10 - type || memory[coord_hor[i]+1][coord_ver[i]] == type ||
+        memory[coord_hor[i]-1][coord_ver[i]] == 10 - type || memory[coord_hor[i]-1][coord_ver[i]] == type ||
+        memory[coord_hor[i]][coord_ver[i]+1] == 10 - type || memory[coord_hor[i]][coord_ver[i]+1] == type ||
+        memory[coord_hor[i]][coord_ver[i]-1] == 10 - type || memory[coord_hor[i]][coord_ver[i]-1] == type) {
+        memory[coord_hor[i]][coord_ver[i]] = 10 - type;
+        arr[coord_hor[i]][coord_ver[i]] = 10 - type;
     }
 }
-void check(int type, int &amount_dis, int amount_moving, int coord_hor[], int coord_ver[],int coord_hor_m[], int coord_ver_m[], int arr[][w]) {
+void check(int type, int &amount_dis, int amount_moving,int coord_hor_m[], int coord_ver_m[], int arr[][w], int memory[][w]) {
     int i;
     for (i = 0; i < amount_moving; i++) {
         if (arr[coord_hor_m[i]][coord_ver_m[i]] == type) {
             if (coord_hor_m[i] == 0 || coord_hor_m[i] == 9 || coord_ver_m[i] == 0 || coord_ver_m[i] == 9
                     ) {
                 arr[coord_hor_m[i]][coord_ver_m[i]] =
-                        10 - type; // 1-> 9, а 2-> 8. FIXME: Чтобы 1 не взаим. с 8, а 2 - с 9.
-                //delete_9_8(i, amount_dis, coord_hor, coord_ver);
+                        10 - type; // 1-> 9, а 2-> 8.
             }
-        }
-    }
-    for (i = 0; i < amount_dis; i++) {
-        if (arr[coord_hor[i]][coord_ver[i]] == type){
-            in_crystal(0,i, i, type,  coord_hor, coord_ver, arr);
-            //Избегаю проверять дислокацию с самой собой, то есть когда i == j, т.к. это бесполезно
-            in_crystal(i+1,amount_dis, i, type, coord_hor, coord_ver, arr);
+            in_crystal(i, type,  coord_hor_m, coord_ver_m, arr, memory);
         }
     }
 }
@@ -180,11 +194,12 @@ int main() {
 
         //int w = 10, h = 10;
         int arr[h][w]; // массив, представляющий кристалл
+
         int i, j;  // строчный и столбцовый индексы соотв.
         int amount_dis = 0;  // кол-во дислокаций в момент генераци
         int amount_moving = 0;
 
-        for (int prob_dis = 50; prob_dis < 100; prob_dis++) {
+        for (int prob_dis = 30; prob_dis < 100; prob_dis++) {
             std::ofstream out;          // поток для записи
             int sum_steps = 0;
             for (int nom_exp = 0; nom_exp < 1; nom_exp++) {
@@ -206,11 +221,11 @@ int main() {
                 //cout << '\n';
 
                 // Массивы с последними координатами всех когда-либо движимых дислокаций
-                int coord_hor[amount_dis]; // гориз коорд dislocation
-                int coord_ver[amount_dis]; // с вертикальными коорд.
-                //  Массивы с теми же коорд., но будут уменьшаться, так как содержат только ныне Moving dislocation
+                // будут уменьшаться, так как содержат только ныне Moving dislocation
                 int coord_hor_m[amount_moving];
                 int coord_ver_m[amount_moving];
+
+                int memory[h][w] = {0}; // массив, в котором будут запоминаться наложенные дислокации
 
 
                 // заполняю массивы координат единиц
@@ -218,8 +233,6 @@ int main() {
                 for (j = 0; j < w; j++) {
                     for (i = 0; i < h; i++) {
                         if (arr[i][j] == 1 || arr[i][j] == 2) {
-                            coord_hor[k] = i;
-                            coord_ver[k] = j;
                             coord_hor_m[k] = i;
                             coord_ver_m[k] = j;
                             k++;
@@ -235,10 +248,11 @@ int main() {
 
                 while (amount_moving != 0) {
                     cout << "-----";
+                    show_crystal(memory);
                     show_crystal(arr);
                     counter++;
-                    check(2, amount_dis,amount_moving, coord_hor, coord_ver, coord_hor_m, coord_ver_m, arr);
-                    check(1, amount_dis,amount_moving, coord_hor, coord_ver, coord_hor_m, coord_ver_m, arr);
+                    check(2, amount_dis,amount_moving,  coord_hor_m, coord_ver_m, arr, memory);
+                    check(1, amount_dis,amount_moving,  coord_hor_m, coord_ver_m, arr, memory);
 
                     // удаляю координаты остановившегося эл-та
                     for (k = 0; k < amount_moving; k++) {
@@ -253,8 +267,6 @@ int main() {
                     }
                     show_coord(amount_moving, coord_hor_m, coord_ver_m);
                     show_crystal(arr);
-                    show_coord(amount_moving, coord_hor_m, coord_ver_m);
-                    show_coord(amount_dis, coord_hor, coord_ver);
 
                     // ПЕРЕМЕШИВАЮ КООРДИНАТЫ
                     int coord_nums[amount_moving];
@@ -268,11 +280,9 @@ int main() {
 
                     // ДВИГАЮ ДИСЛОКАЦИИ
                     for (k = 0; k < amount_moving; k++) {
-                        move(1,coord_hor_m[coord_nums[k]], coord_ver_m[coord_nums[k]], arr, rnd_eng, dstr);
-                        move(2,coord_hor_m[coord_nums[k]], coord_ver_m[coord_nums[k]], arr, rnd_eng, dstr);
+                        move(1,coord_hor_m[coord_nums[k]], coord_ver_m[coord_nums[k]], arr, memory, rnd_eng, dstr);
+                        move(2,coord_hor_m[coord_nums[k]], coord_ver_m[coord_nums[k]], arr, memory, rnd_eng, dstr);
                     }
-
-
                 }
 
                 /*cout << '\n' << "counter= " << counter
