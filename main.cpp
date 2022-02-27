@@ -31,7 +31,7 @@ void move(int type,  int &coord_hor_k, int &coord_ver_k, int arr[][w],
     if (arr[coord_hor_k][coord_ver_k] == type){
         if (maybe(0.5, rnd_eng, dstr)) { // По гориз
             if (maybe(0.5, rnd_eng, dstr)) { // вправо
-                if (arr[coord_hor_k + 1][coord_ver_k] != type) {
+                if (arr[coord_hor_k + 1][coord_ver_k] != type ) {
                     arr[coord_hor_k][coord_ver_k] = 0;
                     arr[coord_hor_k + 1][coord_ver_k] = type;
                     coord_hor_k++;
@@ -80,9 +80,9 @@ void show_coord(int amount_dis,int coord_hor[], int coord_ver[]){
 
 // ИЗОБРАЖАЮ КРИСТАЛЛ СО СЛИПШИМИСЯ ПУСТОТАМИ
 void show_crystal(int arr[][w]) {
-    for (int i = 0; i <= 9; i++) {
+    for (int i = 0; i < h; i++) {
         cout << '\n';
-        for (int j = 0; j <= 9; j++) {
+        for (int j = 0; j < w; j++) {
             cout << arr[i][j] << ' ';
         }
     }
@@ -90,37 +90,72 @@ void show_crystal(int arr[][w]) {
 }
 
 // ПРОВЕРЯЮ НА СОСЕДСТВА ПУСТОТ, СОСЕДСТВА С ГРАНИЦЕЙ
-void subfun(int j_start, int j_stop, int i, int type, int coord_hor[], int coord_ver[], int arr[][w]) {
+void delete_9_8(int &i, int &amount_dis, int coord_hor[], int coord_ver[]){
+    int del_idx;
+    for (del_idx = i; del_idx<amount_dis; del_idx++) {
+        coord_hor[del_idx] = coord_hor[del_idx + 1];
+        coord_ver[del_idx] = coord_ver[del_idx + 1];
+    }
+    amount_dis -= 1;
+    i--;
+}
+void in_crystal(int j_start, int j_stop, int i, int type, int coord_hor[], int coord_ver[], int arr[][w]) {
     int j;
     for (j = j_start; j < j_stop; j++) {
-        if (arr[coord_hor[i]][coord_ver[i]] == type) {
-            if (coord_ver[i] == coord_ver[j] &&
-                arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
+        if (coord_ver[i] == coord_ver[j]){
+            if (type == arr[coord_hor[j]][coord_ver[j]]) {
                 if (coord_hor[i] - 1 == coord_hor[j] || coord_hor[i] + 1 == coord_hor[j]) {
                     arr[coord_hor[i]][coord_ver[i]] = 10 - type;
                     arr[coord_hor[j]][coord_ver[j]] = 10 - type;
+                    cout << "hor " <<coord_hor[i]<< "ver " << coord_ver[i];
+                    //delete_9_8(i, amount_dis, coord_hor, coord_ver);
                 }
             }
-            if (coord_hor[i] == coord_hor[j] &&
-                arr[coord_hor[i]][coord_ver[i]] == arr[coord_hor[j]][coord_ver[j]]) {
+            else if (10 - type == arr[coord_hor[j]][coord_ver[j]]) {
+                if (coord_hor[i] - 1 == coord_hor[j] || coord_hor[i] + 1 == coord_hor[j]) {
+                    arr[coord_hor[i]][coord_ver[i]] = 10 - type;
+                    cout << "hor " <<coord_hor[i]<< "ver " << coord_ver[i];
+                }
+            }
+
+        }
+
+        if (coord_hor[i] == coord_hor[j]) {
+            if (type == arr[coord_hor[j]][coord_ver[j]]) {
                 if (coord_ver[i] - 1 == coord_ver[j] || coord_ver[i] + 1 == coord_ver[j]) {
                     arr[coord_hor[i]][coord_ver[i]] = 10 - type;
                     arr[coord_hor[j]][coord_ver[j]] = 10 - type;
+                    //delete_9_8(i, amount_dis, coord_hor, coord_ver);
+                    cout << "hor " <<coord_hor[i]<< "ver " << coord_ver[i];
+                }
+            }
+            else if (10 - type == arr[coord_hor[j]][coord_ver[j]]) {
+                if (coord_ver[i] - 1 == coord_ver[j] || coord_ver[i] + 1 == coord_ver[j]) {
+                    arr[coord_hor[i]][coord_ver[i]] = 10 - type;
+                    cout << "hor " <<coord_hor[i]<< "ver " << coord_ver[i];
                 }
             }
         }
     }
 }
-void check(int type, int amount_dis, int coord_hor[], int coord_ver[], int arr[][w]) {
+void check(int type, int &amount_dis, int amount_moving, int coord_hor[], int coord_ver[],int coord_hor_m[], int coord_ver_m[], int arr[][w]) {
     int i;
-    for (i = 0; i < amount_dis; i++) {
-        if (coord_hor[i] == 0 || coord_hor[i] == 9 || coord_ver[i] == 0 || coord_ver[i] == 9
-            && arr[coord_hor[i]][coord_ver[i]] == type ){
-            arr[coord_hor[i]][coord_ver[i]] = 10-type; // 1-> 9, а 2-> 8. FIXME: Чтобы 1 не взаим. с 8, а 2 - с 9.
+    for (i = 0; i < amount_moving; i++) {
+        if (arr[coord_hor_m[i]][coord_ver_m[i]] == type) {
+            if (coord_hor_m[i] == 0 || coord_hor_m[i] == 9 || coord_ver_m[i] == 0 || coord_ver_m[i] == 9
+                    ) {
+                arr[coord_hor_m[i]][coord_ver_m[i]] =
+                        10 - type; // 1-> 9, а 2-> 8. FIXME: Чтобы 1 не взаим. с 8, а 2 - с 9.
+                //delete_9_8(i, amount_dis, coord_hor, coord_ver);
+            }
         }
-        subfun(0,i, i, type, coord_hor, coord_ver, arr);
-        //Избегаю проверять дислокацию с самой собой, то есть когда i == j, т.к. это бесполезно
-        subfun(i+1,amount_dis, i, type, coord_hor, coord_ver, arr);
+    }
+    for (i = 0; i < amount_dis; i++) {
+        if (arr[coord_hor[i]][coord_ver[i]] == type){
+            in_crystal(0,i, i, type,  coord_hor, coord_ver, arr);
+            //Избегаю проверять дислокацию с самой собой, то есть когда i == j, т.к. это бесполезно
+            in_crystal(i+1,amount_dis, i, type, coord_hor, coord_ver, arr);
+        }
     }
 }
 
@@ -141,12 +176,13 @@ int main() {
     cout << "Write 1(works) or 2(doesn't work) " << '\n';
     int var; // отвечает за одномерный или многомерный случай
     cin >> var ;
-    if (var==1)
-    {
+    if (var==1){
+
         //int w = 10, h = 10;
         int arr[h][w]; // массив, представляющий кристалл
         int i, j;  // строчный и столбцовый индексы соотв.
-        int amount_dis = 0;  // кол-во дислокаций
+        int amount_dis = 0;  // кол-во дислокаций в момент генераци
+        int amount_moving = 0;
 
         for (int prob_dis = 50; prob_dis < 100; prob_dis++) {
             std::ofstream out;          // поток для записи
@@ -159,6 +195,7 @@ int main() {
                         if (maybe(prob_dis * 0.01, rnd_eng, dstr)){
                             arr[i][j] = maybe(0.5, rnd_eng, dstr)+1; // если 0, то +1 =1=красный; если 1, то +1=2=синий; их вер-ть равна
                             amount_dis++;
+                            amount_moving++;
                         }
                         else arr[i][j] = 0;
 
@@ -168,8 +205,12 @@ int main() {
                 }
                 //cout << '\n';
 
-                int coord_hor[amount_dis]; // массив с гориз коорд единиц
+                // Массивы с последними координатами всех когда-либо движимых дислокаций
+                int coord_hor[amount_dis]; // гориз коорд dislocation
                 int coord_ver[amount_dis]; // с вертикальными коорд.
+                //  Массивы с теми же коорд., но будут уменьшаться, так как содержат только ныне Moving dislocation
+                int coord_hor_m[amount_moving];
+                int coord_ver_m[amount_moving];
 
 
                 // заполняю массивы координат единиц
@@ -179,55 +220,56 @@ int main() {
                         if (arr[i][j] == 1 || arr[i][j] == 2) {
                             coord_hor[k] = i;
                             coord_ver[k] = j;
+                            coord_hor_m[k] = i;
+                            coord_ver_m[k] = j;
                             k++;
                         }
                     }
                 }
                 cout << '\n';
 
-
-                show_coord(amount_dis, coord_hor, coord_ver);
+                show_coord(amount_moving, coord_hor_m, coord_ver_m);
 
                 int counter = 0; // счётчик кол-ва шагов
 
-                while (amount_dis != 0) {
+
+                while (amount_moving != 0) {
+                    cout << "-----";
                     show_crystal(arr);
                     counter++;
-                    check(1, amount_dis, coord_hor, coord_ver, arr);
-                    check(2, amount_dis, coord_hor, coord_ver, arr);
+                    check(2, amount_dis,amount_moving, coord_hor, coord_ver, coord_hor_m, coord_ver_m, arr);
+                    check(1, amount_dis,amount_moving, coord_hor, coord_ver, coord_hor_m, coord_ver_m, arr);
 
                     // удаляю координаты остановившегося эл-та
-                    for (k = 0; k < amount_dis; k++) {
-                        if (arr[coord_hor[k]][coord_ver[k]] == 8 ||arr[coord_hor[k]][coord_ver[k]] == 9) {
-                            for (j = k; j < amount_dis; j++) {
-                                coord_hor[j] = coord_hor[j + 1];
-                                coord_ver[j] = coord_ver[j + 1];
+                    for (k = 0; k < amount_moving; k++) {
+                        if (arr[coord_hor_m[k]][coord_ver_m[k]] == 8 ||arr[coord_hor_m[k]][coord_ver_m[k]] == 9) {
+                            for (j = k; j < amount_moving; j++) {
+                                coord_hor_m[j] = coord_hor_m[j + 1];
+                                coord_ver_m[j] = coord_ver_m[j + 1];
                             }
-                            amount_dis -= 1;
+                            amount_moving -= 1;
                             k--;
                         }
                     }
-                    show_coord(amount_dis, coord_hor, coord_ver);
+                    show_coord(amount_moving, coord_hor_m, coord_ver_m);
                     show_crystal(arr);
+                    show_coord(amount_moving, coord_hor_m, coord_ver_m);
                     show_coord(amount_dis, coord_hor, coord_ver);
 
                     // ПЕРЕМЕШИВАЮ КООРДИНАТЫ
-                    int coord_nums[amount_dis];
-                    for (i = 0; i < amount_dis; i++) {
+                    int coord_nums[amount_moving];
+                    for (i = 0; i < amount_moving; i++) {
                         coord_nums[i] = i;
                     }
 
-
                     for (int n = 0; n < amount_dis; ++n) {
-                        swaparray(coord_nums, amount_dis, rnd_eng, forSwap);
+                        swaparray(coord_nums, amount_moving, rnd_eng, forSwap);
                     }
 
                     // ДВИГАЮ ДИСЛОКАЦИИ
-                    for (k = 0; k < amount_dis; k++) {
-
-                        move(1,coord_hor[coord_nums[k]], coord_ver[coord_nums[k]], arr, rnd_eng, dstr);
-                        move(2, coord_hor[coord_nums[k]], coord_ver[coord_nums[k]], arr, rnd_eng, dstr);
-
+                    for (k = 0; k < amount_moving; k++) {
+                        move(1,coord_hor_m[coord_nums[k]], coord_ver_m[coord_nums[k]], arr, rnd_eng, dstr);
+                        move(2,coord_hor_m[coord_nums[k]], coord_ver_m[coord_nums[k]], arr, rnd_eng, dstr);
                     }
 
 
